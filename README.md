@@ -34,7 +34,7 @@ For data located in `data`: [CC-BY-NC-ND](https://github.com/moritx/performance-
 
 ## Authors
 
-Maximilian Süss
-Katharina Schindegger 
-Moritz Fischer
+- Maximilian Süss
+- Katharina Schindegger 
+- Moritz Fischer
 
