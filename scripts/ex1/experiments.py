@@ -9,6 +9,7 @@ from scripts.ex1.dataset_member import Member
 from scripts.ex1.dataset_zoo import Zoo
 from scripts.ex1.dataset_cancer import Cancer
 from scripts.ex1.dataset_loan import Loan
+import json
 
 import warnings
 
@@ -32,34 +33,47 @@ DATASET_CLASSES = [
     Zoo,
     Cancer
 ]
-result_log = ""
+result_data = []
 
 for classifier, hyper_params in CLASSIFIERS:
     for dataset_cls in DATASET_CLASSES:
         print(f"Cross validating classifier: {classifier} on dataset: {dataset_cls.__name__}")
 
         dataset = dataset_cls(classifier, hyper_params, seed=42)
-        splitter = KFold(n_splits=10, shuffle=True, random_state=42)
+        splitter = KFold(n_splits=5, shuffle=True, random_state=42)
         cv = cross_validate(dataset.pipeline, dataset.X, dataset.y, cv=splitter, scoring=METRICS, error_score="raise",
                             verbose=2)
-        result_log += f"\nCross validation results for classifier: {classifier} on dataset: {dataset_cls.__name__}\n"
-        result_log += f"with hyper parameters: {hyper_params if hyper_params else 'default'}\n"
-        result_log += f"fit_time: {cv['fit_time'].mean():.2f}s (mean) {cv['fit_time'].var():.2f} (var)\n"
-        result_log += f"score_time: {cv['score_time'].var():.2f}s (mean) {cv['score_time'].var():.2f} (var)\n"
-        result_log += f"Accuracy: {cv['test_accuracy'].mean():.2%} (mean) {cv['test_accuracy'].var():.2%} (var)\n"
-        result_log += f"Precision: {cv['test_precision_macro'].mean():.2%} (mean) {cv['test_precision_macro'].var():.2%} (var)\n"
-        result_log += f"Recall: {cv['test_recall_macro'].mean():.2%} (mean) {cv['test_recall_macro'].var():.2%} (var)\n"
-        result_log += f"F1-score: {cv['test_f1_macro'].mean():.2%} (mean) {cv['test_f1_macro'].var():.2%} (var)\n"
+        # Store results in a structured dictionary
+        cv_results = {
+            "classifier": classifier,
+            "dataset": dataset_cls.__name__,
+            "hyper_parameters": hyper_params,
+            "cross_validation_results": {
+                "fit_time": {"mean": cv['fit_time'].mean(), "variance": cv['fit_time'].var()},
+                "score_time": {"mean": cv['score_time'].mean(), "variance": cv['score_time'].var()},
+                "metrics": {}
+            }
+        }
+
+        for metric in METRICS:
+            cv_results["cross_validation_results"]["metrics"][metric] = {
+                "mean": cv[f'test_{metric}'].mean(),
+                "variance": cv[f'test_{metric}'].var()
+            }
 
         X_train, X_test, y_train, y_test = train_test_split(dataset.X, dataset.y, test_size=0.2, random_state=42)
         pipe = dataset.pipeline
         pipe.fit(X_train, y_train)
-        result_log += f"\nHoldout test results for classifier: {classifier} on dataset: {dataset_cls.__name__}\n"
-        result_log += f"with hyper parameters: {hyper_params if hyper_params else 'default'}\n"
+        holdout_results = {}
         for metric in METRICS:
             scorer = get_scorer(metric)
-            y_pred = pipe.predict(X_test)
-            result_log += f"Test {metric}: {scorer(X=X_test, estimator=pipe, y_true=y_test):.2%}\n"
+            score = scorer(pipe, X_test, y_test)
+            holdout_results[metric] = score
+
+        cv_results["holdout_test_results"] = holdout_results
+
+        # Optionally, add confusion matrix and save plots as you did before
+        result_data.append(cv_results)
 
         # Use cross_val_predict to obtain predicted labels during cross-validation
         y_pred_cv = cross_val_predict(dataset.pipeline, dataset.X, dataset.y, cv=splitter)
@@ -90,6 +104,10 @@ for classifier, hyper_params in CLASSIFIERS:
         plt.show()
 
 
-print(result_log)
-with open(os.path.abspath('../../results/ex1_results_other.txt'), 'w') as f:
-    f.write(result_log)
+# Save the result data as JSON
+output_folder = os.path.abspath('../../results')
+os.makedirs(output_folder, exist_ok=True)
+output_file_path = os.path.join(output_folder, 'experiment_results.json')
+
+with open(output_file_path, 'w') as f:
+    json.dump(result_data, f, indent=4)
