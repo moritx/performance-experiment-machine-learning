@@ -1,0 +1,7 @@
+openml
+matplotlib
+seaborn
+ucimlrepo
+pandas
+scikit-learn
+numpy
