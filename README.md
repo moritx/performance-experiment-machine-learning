@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/793432235.svg)](https://zenodo.org/doi/10.5281/zenodo.11085221)
 # Experiment on the performance of different machine learning algorithms for classification
 
 Setup
