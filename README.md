@@ -28,6 +28,5 @@ A dataset which contains characteristics of tumours and one should predict if pa
 Dataset contains characteristics about loans and one should predict the score of a loan application
 
 ## LICENCE
-
-[MIT](https://github.com/moritx/performance-experiment-machine-learning/main/LICENSE)
+[MIT](https://github.com/moritx/performance-experiment-machine-learning/blob/main/LICENSE)
 
