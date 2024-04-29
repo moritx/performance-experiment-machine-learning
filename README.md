@@ -32,3 +32,9 @@ For scripts located in `scripts/ex1`: [MIT](https://github.com/moritx/performanc
 
 For data located in `data`: [CC-BY-NC-ND](https://github.com/moritx/performance-experiment-machine-learning/blob/main/data/LICENSE)
 
+## Authors
+
+Maximilian Süss
+Katharina Schindegger 
+Moritz Fischer
+
