@@ -37,5 +37,5 @@ For data located in `data`: [CC-BY-NC-ND](https://github.com/moritx/performance-
 
 - Maximilian Süss
 - Katharina Schindegger 
-- [Moritz Fischer] (https://orcid.org/0009-0004-8783-6747)
+- [Moritz Fischer](https://orcid.org/0009-0004-8783-6747)
 
